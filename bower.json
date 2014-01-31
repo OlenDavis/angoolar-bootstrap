@@ -23,6 +23,6 @@
     "bower_components"
   ],
   "dependencies": {
-    "angoolar-fontawesome": "v0.0.0"
+    "angoolar-fontawesome": "~0.0.0"
   }
 }
