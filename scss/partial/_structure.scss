@@ -1,0 +1,226 @@
+@import "compass/reset";
+
+@include establish-baseline;
+@include declare-base-styles;
+@include declare-text-styles;
+
+$current-inverse: false;
+$current-secondary: false;
+$current-theme: $default-theme;
+
+body {
+	-webkit-font-smoothing: antialiased;//subpixel-antialiased;//
+
+	-webkit-tap-highlight-color: rgba( white, 0 );
+	// This prevents the clicking links and whatnot from changing the color of the controls being tapped.
+	// This is particularly relevant for iOS.
+	
+	@include sans-serif;
+
+	// // A better alternative: by default elements on the page aren't selectable:
+	// @extend .#{ $class-not-selectable };
+	// // but, elements one would semantically expect to be texty are:
+	// a, span, p, h1, h2, h3, h4, h5, h6, .#{ $class-button }, .#{ $class-flat-button }, .#{ $class-hybrid-button } {
+	// 	@extend .#{ $class-selectable };		
+	// }
+
+	// Personal preference; may comment/uncomment at will, but perhaps copy/pastable sections should be made copy/pastable only when copying/pasting is intended.
+	// Again though, this is mostly helpful on iOS when users may not know they're long-clicking when they are, and then a copy popup puts them off - especially for web-appy sites.
+	
+	cursor: default;
+	
+	* {
+		// This will prevent the little dotted areas from showing up around links particularly on IE browsers, but elsewhere as well.
+		outline: none;
+	}
+
+	a {
+		color: inherit;
+	}
+}
+
+a { @extend .#{ $class-link }; }
+small { @extend .#{ $class-small }; }
+b {&, td & { @extend .#{ $class-b }; }}
+i, em { @extend .#{ $class-em }; }
+u { @extend .#{ $class-u }; }
+table { @extend .#{ $class-table }; }
+
+select {
+	margin: 0;
+}
+
+input, textarea, keygen, select, button {
+	padding       : initial;
+	text-transform: inherit;
+}
+input, textarea, keygen, select, button, caption, th, td {
+	font-weight: inherit;
+}
+
+.inherit-line-height {
+	line-height: inherit;
+}
+
+.label-padded {
+	padding: .25em .25em .2em .25em;
+}
+
+.no-background {
+	background: none !important;
+}
+
+.flex {
+	@include display-box;
+
+	&.horizontal {
+		@include box-orient( horizontal );
+	}
+	&.vertical {
+		@include box-orient( vertical );
+	}
+
+	&.align-start {
+		@include box-align( start );
+	}
+	&.align-end {
+		@include box-align( end );
+	}
+	&.align-center {
+		@include box-align( center );
+	}
+	&.align-baseline {
+		@include box-align( baseline );
+	}
+	&.align-stretch {
+		@include box-align( stretch );
+	}
+
+	&.normal {
+		@include box-direction( normal );
+	}
+	&.reverse {
+		@include box-direction( reverse );
+	}
+
+	&.pack-start {
+		@include box-pack( start );
+	}
+	&.pack-end {
+		@include box-pack( end );
+	}
+	&.pack-center {
+		@include box-pack( center );
+	}
+
+	> * {
+		&.align-start {
+			@include box-pack( start );
+		}
+		&.align-end {
+			@include box-pack( end );
+		}
+		&.align-center {
+			@include box-pack( center );
+		}
+
+		@for $flex-value from $min-flex-value through $max-flex-value {
+			&.flex-#{ $flex-value } {
+				@include box-flex( $flex-value );
+			}
+		}
+	}
+
+	&.modern {
+		@include experimental-value( display, flex, -moz, -webkit, not -o, -ms, not -khtml, official );
+
+		&.horizontal {
+			@include experimental( flex-direction, row, -moz, -webkit, not -o, -ms, not -khtml, official );
+
+			&.wrap {
+				@include experimental( flex-flow, row wrap, -moz, -webkit, not -o, -ms, not -khtml, official );			
+				&.reverse {
+					@include experimental( flex-flow, row wrap-reverse, -moz, -webkit, not -o, -ms, not -khtml, official );			
+				}
+			}
+		}
+		&.vertical {
+			@include experimental( flex-direction, column, -moz, -webkit, not -o, -ms, not -khtml, official );
+
+			&.wrap {
+				@include experimental( flex-flow, column wrap, -moz, -webkit, not -o, -ms, not -khtml, official );			
+				&.reverse {
+					@include experimental( flex-flow, column wrap-reverse, -moz, -webkit, not -o, -ms, not -khtml, official );			
+				}
+			}
+		}
+		&.align-stretch {
+			@include experimental( align-items, stretch, -moz, -webkit, not -o, -ms, not -khtml, official );			
+		}
+
+		> * {
+			@for $flex-value from $min-flex-value through $max-flex-value {
+				&.flex-#{ $flex-value } {
+					@include experimental( flex, #{ $flex-value } #{ $flex-value } 0, -moz, -webkit, not -o, -ms, not -khtml, official );
+					&.auto {
+						@include experimental( flex, #{ $flex-value } #{ $flex-value } auto, -moz, -webkit, not -o, -ms, not -khtml, official );
+						&.grow-only {
+							@include experimental( flex, #{ $flex-value } 0 auto, -moz, -webkit, not -o, -ms, not -khtml, official );
+						}
+						&.shrink-only {
+							@include experimental( flex, 0 #{ $flex-value } auto, -moz, -webkit, not -o, -ms, not -khtml, official );
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+$line-heights: ( ( 'single', 1 ), ( 'double', 2 ), ( 'whole', 100% ), ( 'extra', 1.5 ) );
+
+@each $line-height in $line-heights {
+	$line-height-name : nth( $line-height, 1 );
+	$line-height-value: nth( $line-height, 2 );
+
+	.#{ $line-height-name }-lined {
+		line-height: $line-height-value;
+	}
+}
+
+$class-scaled: "scaled-to-";
+$scales: ( ( 'nothing', 0 ), ( 'half', .5 ), ( '75', .75 ), ( '90', .9 ), ( 'whole', 1 ), ( 'double', 2 ) );
+
+@each $scale in $scales {
+	$scale-name: nth( $scale, 1 );
+	$scalar    : nth( $scale, 2 );
+	.#{ $class-scaled }#{ $scale-name } {
+		@include scale( $scalar, $scalar );
+	}	
+	.#{ $class-scaled }#{ $scale-name }-#{ $class-when-hovered } {
+		@include when-hovered {
+			@include scale( $scalar, $scalar );
+		}
+	}	
+}
+
+.label {
+	@include small;
+	@include b;
+	@include wide;
+	@include uppercase;
+	@include mostly-opaque;
+}
+
+$reasonable: 20em;
+.reasonable-max-height {
+	max-height: $reasonable;
+}
+
+.reasonable-min-height {
+	min-height: $reasonable;
+}
+
+.no-max-height {
+	max-height: 0em
+}

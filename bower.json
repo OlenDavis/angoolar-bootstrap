@@ -1,0 +1,29 @@
+{
+  "name": "angoolar-zootstrap",
+  "version": "0.0.0",
+  "authors": [
+    "Olen Davis <spelledlikeitsounds@gmail.com>"
+  ],
+  "description": "This defines the Zootstrap CSS framework for establishing a common pure-CSS styling framework for AngOOlar projects.",
+  "keywords": [
+    "angoolar",
+    "angular",
+    "zootstrap",
+    "bootstrap",
+    "css",
+    "sass",
+    "scss",
+    "framework",
+    "approach"
+  ],
+  "license": "MIT",
+  "homepage": "http://angoolar.com",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components"
+  ],
+  "dependencies": {
+    "angoolar-fontawesome": "../angoolar-fontawesome"
+  }
+}

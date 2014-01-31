@@ -1,0 +1,247 @@
+@import "compass";
+
+$legacy-support-for-ie: true;
+
+//////////////////////// GLOBAL THEMING PARAMETERS
+
+$default-mostly: .40;
+$default-barely: .9;
+
+$default-lightening: 10%; //30%;
+$default-darkening : 5%; //15%;
+$default-desaturation: 90%;
+
+//                 primary-light,         primary-dark,          lightening,          darkening
+$default-primary-colors:   white, tint( black, 20% ), $default-lightening, $default-darkening;
+$header-primary-colors :   white, tint( black, 20% ), $default-lightening, $default-darkening;
+$error-primary-colors  :   white,                red, $default-lightening, $default-darkening;
+$black-primary-colors  :   white,              black, $default-lightening, $default-darkening;
+
+$green     : rgb( 133, 184, 70 );
+$blue      : rgb( 19, 116, 165 );
+$orange    : #FF9900;
+$red       : #FF0000;
+$light-blue: #91d2e1; // From Analytics
+
+//                           secondary-light, secondary-dark,          lightening,          darkening
+$black-secondary-colors :            #353535,               #191919, $default-lightening, $default-darkening;
+$green-secondary-colors :             $green, shade(  $green, 10% ), $default-lightening, $default-darkening;
+$blue-secondary-colors  : tint( $blue, 10% ), shade(   $blue, 10% ), $default-lightening, $default-darkening;//#0059B1;
+$red-secondary-colors   :               $red, shade(    $red, 10% ), $default-lightening, $default-darkening;
+$orange-secondary-colors:            $orange, shade( $orange, 10% ), $default-lightening, $default-darkening;
+$purple-secondary-colors:            #8D4AB3,               #552C6C, $default-lightening, $default-darkening;
+$grey-secondary-colors  :            #AAAAAA,               #888888, $default-lightening, $default-darkening;
+$error-secondary-colors :            #FE5656,               #A70000, $default-lightening, $default-darkening;
+
+//                        shadow, shadow-opacity, shadow-primary-depth, shadow-secondary-depth, shadow-hovered-depth-factor
+$default-shadow-theming:   black,             .5,                  2px,                    1px,                        1.25;
+$header-shadow-theming :   black,             .5,                  4px,                    1px,                         1.5;
+$error-shadow-theming  : #660000,             .5,                  2px,                    1px,                        1.25;
+
+//             border-radius, border-width, border-style, border-opacity, border-heavy-opacity-factor, border-thick-factor
+$default-border-theming: 3px,          1px,        solid,             .1,                          10,                   2;
+// $header-border-theming : 4px,          3px,        solid,              1,                           1,                   3;
+$error-border-theming  : $default-border-theming;
+
+//                     standard-padding,          less-padding,          more-padding,       standard-margin,           less-margin,           more-margin
+$default-spacing: $base-line-height / 2, $base-line-height / 3,     $base-line-height, $base-line-height / 2, $base-line-height / 3,     $base-line-height;
+
+// $default-themes: (
+// 	/*           named,   extends,          primary-colors,           secondary-colors,          shadow-theming,          border-theming,  spacing-theming */
+// 	// (        'default',    'body', $default-primary-colors,    $green-secondary-colors, $default-shadow-theming, $default-border-theming, $default-spacing ),
+// 	( 'default-header',     false,  $header-primary-colors,    $orange-secondary-colors,  $header-shadow-theming,  $header-border-theming,            false ),
+
+// 	// (          'blue',    false,      $default-primary-colors,   $blue-secondary-colors,                   false, $default-border-theming,            false ),
+// 	(           'red',    false,      $default-primary-colors,    $red-secondary-colors,                   false, $default-border-theming,            false ),
+// 	// (   'blue-header',    false,       $header-primary-colors,   $blue-secondary-colors,  $header-shadow-theming,  $header-border-theming,            false )
+// 	(    'red-header',    false,       $header-primary-colors,    $red-secondary-colors,  $header-shadow-theming,  $header-border-theming,            false )
+// );
+$default-theme: (        'default',    'body', $default-primary-colors,    $orange-secondary-colors, $default-shadow-theming, $default-border-theming, $default-spacing ); //nth( $default-themes, 1 );
+
+//////////////////////// GLOBAL LAYOUT PARAMETERS
+
+$ratio-properties: ( width height top bottom left ); // This determines for which properties a range of ratio classes will be generated; you could also use ( width, max-width ) for instance.
+
+$ratio-denominator-range: ( 2, 7 ); // These are denominators for which .ratio-#{ $numerator }-#{ $denominator } classes will be generated.
+// So, for ( 2, 3 ), the classes .ratio-1-2, .ratio-1-3, and .ratio-2-3 would be generated.
+
+$default-underestimation: 1%; // This is the default underestimation of the percentages generated for each of the ratio classes.
+// So, for .ratio-1-2 with an underestimation of 1%, the width generated would be 49% rather than 50%.
+
+$min-flex-value: 0;
+$max-flex-value: 10;
+
+//////////////////////// GLOBAL ANIMATION PARAMETERS
+
+$default-transition-duration: 300ms;
+$default-transition-function: ease-in-out;
+
+$default-perspective: 50em;
+$default-origin-y   : 0%;
+$default-animation-duration: $default-transition-duration;
+$pulse-scale-extent: .1;
+
+//////////////////////// TEXT STYLING
+
+$base-font-size  : 15px;
+$base-line-height: 24px;
+
+$sans-serif-font-family: pragmatica-web-condensed, Arial, Helvetica, sans-serif;
+$serif-font-family: 'Times New Roman', serif;
+
+$h6-font-size: 16px;
+$h5-font-size: 18px;
+$h4-font-size: 20px;
+$h3-font-size: 24px;
+$h2-font-size: 32px;
+$h1-font-size: 44px;
+
+$text-lines: 1;
+
+$small     : 80%;
+$very-small: 60%;
+
+$default-text-styles: (
+/*                                                tag,             font-family, color,       font-size,       lines, leader, leader-property, trailer, trailer-property, lr-padding-lines */
+	( "body, input, textarea, keygen, select, button", $sans-serif-font-family, false, $base-font-size, $text-lines,  false,           false,   false,            false,            false ),
+	(                                       "h6, .h6",                   false, false,   $h6-font-size,       false,  false,           false,   false,            false,            false ),
+	(                                       "h5, .h5",                   false, false,   $h5-font-size,       false,  false,           false,   false,            false,            false ),
+	(                                       "h4, .h4",                   false, false,   $h4-font-size,       false,  false,           false,   false,            false,            false ),
+	(                                       "h3, .h3",                   false, false,   $h3-font-size,       false,  false,           false,   false,            false,            false ),
+	(                                       "h2, .h2",                   false, false,   $h2-font-size,       false,  false,           false,   false,            false,            false ),
+	(                                       "h1, .h1",                   false, false,   $h1-font-size,       false,  false,           false,   false,            false,            false ),
+	(                                         "p, .p",                   false, false,           false,       false,  false,           false,      .5,            false,            false )
+);
+
+@mixin declare-text-styles( $text-styles: $default-text-styles ) {
+	@each $text-style in $text-styles {
+		$text-tag        : nth( $text-style,  1 );
+		$font-family     : nth( $text-style,  2 );
+		$color           : nth( $text-style,  3 );
+		$font-size       : nth( $text-style,  4 );
+		$lines           : nth( $text-style,  5 );
+		$leader          : nth( $text-style,  6 );
+		$leader-property : nth( $text-style,  7 );
+		$trailer         : nth( $text-style,  8 );
+		$trailer-property: nth( $text-style,  9 );
+		$lr-padding-lines: nth( $text-style, 10 );
+
+		#{ $text-tag } {
+			@if $font-family {
+				font-family: $font-family;
+			}
+			@if $color {
+				color: $color;
+			}
+			
+			@if $font-size != false and $lines != false {
+				@include adjust-font-size-to( $font-size, $lines );
+			}
+			@else if $font-size != false {
+				font-size: $font-size / $base-font-size * 1em;
+				line-height: 1em;
+			}
+
+			@if $leader != false {
+				@if $leader-property != false {
+					@include leader( $lines: $leader, $property: $leader-property );
+				}
+				@else {
+					@include leader( $leader );
+				}
+			}
+
+			@if $trailer != false {
+				@if $trailer-property != false {
+					@include trailer( $lines: $trailer, $property: $trailer-property );
+				}
+				@else {
+					@include trailer( $trailer );
+				}
+			}
+			
+			@if $lr-padding-lines != false {
+				padding-left:  rhythm( $lr-padding-lines );
+				padding-right: rhythm( $lr-padding-lines );
+			}
+		}
+	}
+}
+
+@mixin when-hovered {
+	&:hover, &.#{ $class-hover } {
+		@content;
+	}
+}
+@mixin when-at {
+	&:hover, &.#{ $class-hover }, &:focus {
+		@content;
+	}
+}
+@mixin when-just-touching {
+	&:focus {
+		@content;
+	}
+}
+@mixin when-active {
+	&:active, &.#{ $class-active } {
+		@content;
+	}
+}
+@mixin when-touching {
+	&:hover, &.#{ $class-hover } { &:active, &.#{ $class-active } {
+		@content;
+	} }
+}
+@mixin whenever {
+	&, &:hover, &.#{ $class-hover }, &:focus, &:active, &.#{ $class-active } {
+		@content;
+	}
+}
+
+@mixin when-disabled {
+	&.disabled, &[disabled] {
+		@content;
+	}
+}
+
+@mixin when-retina {
+	@media (-webkit-min-device-pixel-ratio: 1.5), (min-resolution: 144dpi), (min-resolution: 2dppx) {
+		@content;
+	}
+}
+
+@mixin when-first {
+	&:first-child, .first {
+		@content;
+	}
+}
+
+@mixin when-last {
+	&:last-child, .last {
+		@content;
+	}
+}
+
+@mixin when-font-awesome-icon {
+	&, &[class^="icon-"]:before, &[class*=" icon-"]:before {
+		@content;
+	}
+}
+
+@mixin when-ff {
+	.#{ $class-ff } & {
+		@content;
+	}
+}
+
+@import "partial/class_names";
+@import "partial/class_mixins";
+
+@import "partial/animation_names";
+@import "partial/animation_mixins";
+@import "animation_keyframes";
+
+@import "partial/common_theming";
+
+@import "common_animation";
