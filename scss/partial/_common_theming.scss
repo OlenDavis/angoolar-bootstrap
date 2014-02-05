@@ -1,6 +1,8 @@
-$current-theme: $default-theme;
-$current-inverse: false;
-$current-secondary: false;
+$current-theme              : $default-theme;
+$current-inverse            : false;
+$current-secondary          : false;
+$current-with-this-modifiers: false; // indicates whether to render support for the secondary-this and inverse-this modifiers
+$current-with-themed-style  : false; // indicates whether to render the fully themed style class for each style; e.g. .blue-inverse-secondary-button rather than .blue.inverse.secondary.button
 
 $name-index     : 1;
 $extends-index  : 2;
@@ -215,14 +217,21 @@ $more-margin-index     : 6;
 	@return $class-name + "-#{ $class-when-ff }";
 }
 
-@mixin declare-style( $class-name, $theme: $current-theme, $is-themeless: false ) {
+@mixin declare-style(
+	$class-name,
+	$theme            : $current-theme,
+	$is-themeless     : $current-is-themeless,
+	$with-themed-style: $current-with-themed-style
+) {
 	@if $is-themeless {
 		// $themeless-style-name: get-themed-style-name( $class-name: $class-name );
 		.#{ $class-name } { @content; }
 	}
 	@else {
-		$themed-style-name: get-themed-style-name( $class-name: $class-name, $theme: $theme );
-		.#{ $themed-style-name } { @content; }
+		@if $with-themed-style {
+			$themed-style-name: get-themed-style-name( $class-name: $class-name, $theme: $theme );
+			.#{ $themed-style-name } { @content; }
+		}
 
 		#{ get-theme-selector( $theme: $theme ) } {
 			.#{  $class-name }, 
@@ -234,10 +243,18 @@ $more-margin-index     : 6;
 	}
 }
 
-@mixin declare-inverse-style( $class-name, $theme: $current-theme, $is-themeless: false ) {
+@mixin declare-inverse-style(
+	$class-name,
+	$theme              : $current-theme,
+	$is-themeless       : $current-is-themeless,
+	$with-this-modifiers: $current-with-this-modifiers,
+	$with-themed-style  : $current-with-themed-style
+) {
 	@if $is-themeless {
-		// $themeless-style-name: get-themed-style-name( $class-name: $class-name );
-		// .#{ $themeless-style-name } { @content; }
+		@if $with-themed-style {
+			$themeless-style-name: get-themed-style-name( $class-name: $class-name );
+			.#{ $themeless-style-name } { @content; }
+		}
 
 		.#{ $class-inverse } { // inverse then and with class
 			.#{  $class-name }, 
@@ -246,14 +263,18 @@ $more-margin-index     : 6;
 				// @extend .#{ $themeless-style-name } !optional; // The reason for the !optional is that when the style @content is actually empty, the resultant .#{ $themed-style-name } won't actually be created which will cause an indefinite hang in the SASS compiling. SASS doesn't yet let you do any kind of checking that @content exists or not, so adding this !optional is the only means of accounting for styles that basically aren't defined for the given theme.
 			}
 		}
-		// .#{ $class-name }.#{ $class-inverse-this } { // inverse-this with class
-		// 	// @content;
-		// 	@extend .#{ $themeless-style-name } !optional; // The reason for the !optional is that when the style @content is actually empty, the resultant .#{ $themed-style-name } won't actually be created which will cause an indefinite hang in the SASS compiling. SASS doesn't yet let you do any kind of checking that @content exists or not, so adding this !optional is the only means of accounting for styles that basically aren't defined for the given theme.
-		// }
+		@if $with-this-modifiers {
+			.#{ $class-name }.#{ $class-inverse-this } { // inverse-this with class
+				@content;
+				// @extend .#{ $themeless-style-name } !optional; // The reason for the !optional is that when the style @content is actually empty, the resultant .#{ $themed-style-name } won't actually be created which will cause an indefinite hang in the SASS compiling. SASS doesn't yet let you do any kind of checking that @content exists or not, so adding this !optional is the only means of accounting for styles that basically aren't defined for the given theme.
+			}
+		}
 	}
 	@else {
-		// $themed-style-name: get-themed-style-name( $class-name: $class-name, $theme: $theme );
-		// .#{ $themed-style-name } { @content; }
+		@if $with-themed-style {
+			$themed-style-name: get-themed-style-name( $class-name: $class-name, $theme: $theme );
+			.#{ $themed-style-name } { @content; }
+		}
 
 		#{ get-theme-selector( $theme: $theme ) } {
 			.#{  $class-inverse }, // theme, then inverse, with and then class 
@@ -265,21 +286,31 @@ $more-margin-index     : 6;
 					// @extend .#{ $themed-style-name } !optional; // The reason for the !optional is that when the style @content is actually empty, the resultant .#{ $themed-style-name } won't actually be created which will cause an indefinite hang in the SASS compiling. SASS doesn't yet let you do any kind of checking that @content exists or not, so adding this !optional is the only means of accounting for styles that basically aren't defined for the given theme.
 				}
 			}
-			// .#{  $class-name }, // theme, then class with inverse-this
-			// &.#{ $class-name } { // theme with class with inverse-this
-			// 	&.#{ $class-inverse-this } { 
-			// 		// @content;
-			// 		@extend .#{ $themed-style-name } !optional; // The reason for the !optional is that when the style @content is actually empty, the resultant .#{ $themed-style-name } won't actually be created which will cause an indefinite hang in the SASS compiling. SASS doesn't yet let you do any kind of checking that @content exists or not, so adding this !optional is the only means of accounting for styles that basically aren't defined for the given theme.
-			// 	}
-			// }
+			@if $with-this-modifiers {
+				.#{  $class-name }, // theme, then class with inverse-this
+				&.#{ $class-name } { // theme with class with inverse-this
+					&.#{ $class-inverse-this } { 
+						@content;
+						// @extend .#{ $themed-style-name } !optional; // The reason for the !optional is that when the style @content is actually empty, the resultant .#{ $themed-style-name } won't actually be created which will cause an indefinite hang in the SASS compiling. SASS doesn't yet let you do any kind of checking that @content exists or not, so adding this !optional is the only means of accounting for styles that basically aren't defined for the given theme.
+					}
+				}
+			}
 		}
 	}
 }
 
-@mixin declare-secondary-style( $class-name, $theme: $current-theme, $is-themeless: false ) {
+@mixin declare-secondary-style(
+	$class-name,
+	$theme              : $current-theme,
+	$is-themeless       : $current-is-themeless,
+	$with-this-modifiers: $current-with-this-modifiers,
+	$with-themed-style  : $current-with-themed-style
+) {
 	@if $is-themeless {
-		// $themeless-style-name: get-themed-style-name( $class-name: $class-name );
-		// .#{ $themeless-style-name } { @content; }
+		@if $with-themed-style {
+			$themeless-style-name: get-themed-style-name( $class-name: $class-name );
+			.#{ $themeless-style-name } { @content; }
+		}
 
 		.#{ $class-secondary } { // secondary then and with class
 			.#{  $class-name }, 
@@ -288,14 +319,18 @@ $more-margin-index     : 6;
 				// @extend .#{ $themeless-style-name } !optional; // The reason for the !optional is that when the style @content is actually empty, the resultant .#{ $themed-style-name } won't actually be created which will cause an indefinite hang in the SASS compiling. SASS doesn't yet let you do any kind of checking that @content exists or not, so adding this !optional is the only means of accounting for styles that basically aren't defined for the given theme.
 			}
 		}
-		// .#{ $class-name }.#{ $class-secondary-this } { // secondary-this with class
-		// 	// @content;
-		// 	@extend .#{ $themeless-style-name } !optional; // The reason for the !optional is that when the style @content is actually empty, the resultant .#{ $themed-style-name } won't actually be created which will cause an indefinite hang in the SASS compiling. SASS doesn't yet let you do any kind of checking that @content exists or not, so adding this !optional is the only means of accounting for styles that basically aren't defined for the given theme.
-		// }
+		@if $with-this-modifiers {
+			.#{ $class-name }.#{ $class-secondary-this } { // secondary-this with class
+				@content;
+				// @extend .#{ $themeless-style-name } !optional; // The reason for the !optional is that when the style @content is actually empty, the resultant .#{ $themed-style-name } won't actually be created which will cause an indefinite hang in the SASS compiling. SASS doesn't yet let you do any kind of checking that @content exists or not, so adding this !optional is the only means of accounting for styles that basically aren't defined for the given theme.
+			}
+		}
 	}
 	@else {
-		$themed-style-name: get-themed-style-name( $class-name: $class-name, $theme: $theme );
-		.#{ $themed-style-name } { @content; }
+		@if $with-themed-style {
+			$themed-style-name: get-themed-style-name( $class-name: $class-name, $theme: $theme );
+			.#{ $themed-style-name } { @content; }
+		}
 
 		#{ get-theme-selector( $theme: $theme ) } {
 			.#{  $class-secondary }, // theme, then secondary, with and then class 
@@ -307,21 +342,31 @@ $more-margin-index     : 6;
 					// @extend .#{ $themed-style-name } !optional; // The reason for the !optional is that when the style @content is actually empty, the resultant .#{ $themed-style-name } won't actually be created which will cause an indefinite hang in the SASS compiling. SASS doesn't yet let you do any kind of checking that @content exists or not, so adding this !optional is the only means of accounting for styles that basically aren't defined for the given theme.
 				}
 			}
-			// .#{  $class-name }, // theme, then class with secondary-this
-			// &.#{ $class-name } { // theme with class with secondary-this
-			// 	&.#{ $class-secondary-this } { 
-			// 		// @content;
-			// 		@extend .#{ $themed-style-name } !optional; // The reason for the !optional is that when the style @content is actually empty, the resultant .#{ $themed-style-name } won't actually be created which will cause an indefinite hang in the SASS compiling. SASS doesn't yet let you do any kind of checking that @content exists or not, so adding this !optional is the only means of accounting for styles that basically aren't defined for the given theme.
-			// 	}
-			// }
+			@if $with-this-modifiers {
+				.#{  $class-name }, // theme, then class with secondary-this
+				&.#{ $class-name } { // theme with class with secondary-this
+					&.#{ $class-secondary-this } { 
+						@content;
+						// @extend .#{ $themed-style-name } !optional; // The reason for the !optional is that when the style @content is actually empty, the resultant .#{ $themed-style-name } won't actually be created which will cause an indefinite hang in the SASS compiling. SASS doesn't yet let you do any kind of checking that @content exists or not, so adding this !optional is the only means of accounting for styles that basically aren't defined for the given theme.
+					}
+				}
+			}
 		}
 	}
 }
 
-@mixin declare-inverse-secondary-style( $class-name, $theme: $current-theme, $is-themeless: false ) {
+@mixin declare-inverse-secondary-style(
+	$class-name,
+	$theme              : $current-theme,
+	$is-themeless       : $current-is-themeless,
+	$with-this-modifiers: $current-with-this-modifiers,
+	$with-themed-style  : $current-with-themed-style
+) {
 	@if $is-themeless {
-		// $themeless-style-name: get-themed-style-name( $class-name: $class-name );
-		// .#{ $themeless-style-name } { @content; }
+		@if $with-themed-style {
+			$themeless-style-name: get-themed-style-name( $class-name: $class-name );
+			.#{ $themeless-style-name } { @content; }
+		}
 		
 		.#{ $class-inverse   } .#{ $class-secondary }, // inverse then secondary, with and then class
 		.#{ $class-secondary } .#{ $class-inverse   }, // secondary then inverse, with and then class
@@ -332,28 +377,36 @@ $more-margin-index     : 6;
 				// @extend .#{ $themeless-style-name } !optional; // The reason for the !optional is that when the style @content is actually empty, the resultant .#{ $themed-style-name } won't actually be created which will cause an indefinite hang in the SASS compiling. SASS doesn't yet let you do any kind of checking that @content exists or not, so adding this !optional is the only means of accounting for styles that basically aren't defined for the given theme.
 			}
 		}
-		// .#{ $class-inverse } { // inverse with and then class, with secondary-this
-		// 	.#{  $class-name }, 
-		// 	&.#{ $class-name } {
-		// 		&.#{ $class-secondary-this } {
-		// 			// @content;
-		// 			@extend .#{ $themeless-style-name } !optional; // The reason for the !optional is that when the style @content is actually empty, the resultant .#{ $themed-style-name } won't actually be created which will cause an indefinite hang in the SASS compiling. SASS doesn't yet let you do any kind of checking that @content exists or not, so adding this !optional is the only means of accounting for styles that basically aren't defined for the given theme.
-		// 		}
-		// 	}
-		// }
-		// .#{ $class-secondary } { // secondary with and then class, with inverse-this
-		// 	.#{  $class-name }, 
-		// 	&.#{ $class-name } {
-		// 		&.#{ $class-inverse-this } {
-		// 			// @content;
-		// 			@extend .#{ $themeless-style-name } !optional; // The reason for the !optional is that when the style @content is actually empty, the resultant .#{ $themed-style-name } won't actually be created which will cause an indefinite hang in the SASS compiling. SASS doesn't yet let you do any kind of checking that @content exists or not, so adding this !optional is the only means of accounting for styles that basically aren't defined for the given theme.
-		// 		}
-		// 	}
-		// }
+		.#{ $class-inverse } { // inverse with and then class, with secondary-this
+			.#{  $class-name }, 
+			&.#{ $class-name } {
+				&.#{ $class-secondary-this } {
+					@content;
+					// @extend .#{ $themeless-style-name } !optional; // The reason for the !optional is that when the style @content is actually empty, the resultant .#{ $themed-style-name } won't actually be created which will cause an indefinite hang in the SASS compiling. SASS doesn't yet let you do any kind of checking that @content exists or not, so adding this !optional is the only means of accounting for styles that basically aren't defined for the given theme.
+				}
+			}
+		}
+		.#{ $class-secondary } { // secondary with and then class, with inverse-this
+			.#{  $class-name }, 
+			&.#{ $class-name } {
+				&.#{ $class-inverse-this } {
+					@content;
+					// @extend .#{ $themeless-style-name } !optional; // The reason for the !optional is that when the style @content is actually empty, the resultant .#{ $themed-style-name } won't actually be created which will cause an indefinite hang in the SASS compiling. SASS doesn't yet let you do any kind of checking that @content exists or not, so adding this !optional is the only means of accounting for styles that basically aren't defined for the given theme.
+				}
+			}
+		}
+		@if $with-this-modifiers {
+			.#{ $class-inverse-this }.#{ $class-secondary-this }.#{ $class-name } { // theme then inverse-this with secondary-this, with class
+				@content;
+				// @extend .#{ $themed-style-name } !optional; // The reason for the !optional is that when the style @content is actually empty, the resultant .#{ $themed-style-name } won't actually be created which will cause an indefinite hang in the SASS compiling. SASS doesn't yet let you do any kind of checking that @content exists or not, so adding this !optional is the only means of accounting for styles that basically aren't defined for the given theme.
+			}
+		}
 	}
 	@else {
-		// $themed-style-name: get-themed-style-name( $class-name: $class-name, $theme: $theme );
-		// .#{ $themed-style-name } { @content; }
+		@if $with-themed-style {
+			$themed-style-name: get-themed-style-name( $class-name: $class-name, $theme: $theme );
+			.#{ $themed-style-name } { @content; }
+		}
 
 		#{ get-theme-selector( $theme: $theme ) } {
 			.#{  $class-inverse   } .#{ $class-secondary }, // theme then inverse, then secondary, with and then class
@@ -371,34 +424,44 @@ $more-margin-index     : 6;
 					// @extend .#{ $themed-style-name } !optional; // The reason for the !optional is that when the style @content is actually empty, the resultant .#{ $themed-style-name } won't actually be created which will cause an indefinite hang in the SASS compiling. SASS doesn't yet let you do any kind of checking that @content exists or not, so adding this !optional is the only means of accounting for styles that basically aren't defined for the given theme.
 				}
 			}
-			// .#{  $class-inverse }, // theme then inverse, with and then class, with secondary-this
-			// &.#{ $class-inverse }, // theme with inverse, with and then class, with secondary-this
-			// .#{  $class-inverse } & { // inverse then theme, with and then class, with secondary-this
-			// 	.#{  $class-name }, 
-			// 	&.#{ $class-name } {
-			// 		&.#{ $class-secondary-this } {
-			// 			// @content;
-			// 			@extend .#{ $themed-style-name } !optional; // The reason for the !optional is that when the style @content is actually empty, the resultant .#{ $themed-style-name } won't actually be created which will cause an indefinite hang in the SASS compiling. SASS doesn't yet let you do any kind of checking that @content exists or not, so adding this !optional is the only means of accounting for styles that basically aren't defined for the given theme.
-			// 		}
-			// 	}
-			// }
-			// .#{  $class-secondary }, // theme then secondary, with and then class, with inverse-this
-			// &.#{ $class-secondary }, // theme with secondary, with and then class, with inverse-this
-			// .#{  $class-secondary } & { // secondary then theme, with and then class, with inverse-this
-			// 	.#{  $class-name }, 
-			// 	&.#{ $class-name } {
-			// 		&.#{ $class-inverse-this } {
-			// 			// @content;
-			// 			@extend .#{ $themed-style-name } !optional; // The reason for the !optional is that when the style @content is actually empty, the resultant .#{ $themed-style-name } won't actually be created which will cause an indefinite hang in the SASS compiling. SASS doesn't yet let you do any kind of checking that @content exists or not, so adding this !optional is the only means of accounting for styles that basically aren't defined for the given theme.
-			// 		}
-			// 	}
-			// }
+			@if $with-this-modifiers {
+				.#{  $class-inverse }, // theme then inverse, with and then class, with secondary-this
+				&.#{ $class-inverse }, // theme with inverse, with and then class, with secondary-this
+				.#{  $class-inverse } & { // inverse then theme, with and then class, with secondary-this
+					.#{  $class-name }, 
+					&.#{ $class-name } {
+						&.#{ $class-secondary-this } {
+							@content;
+							// @extend .#{ $themed-style-name } !optional; // The reason for the !optional is that when the style @content is actually empty, the resultant .#{ $themed-style-name } won't actually be created which will cause an indefinite hang in the SASS compiling. SASS doesn't yet let you do any kind of checking that @content exists or not, so adding this !optional is the only means of accounting for styles that basically aren't defined for the given theme.
+						}
+					}
+				}
+				.#{  $class-secondary }, // theme then secondary, with and then class, with inverse-this
+				&.#{ $class-secondary }, // theme with secondary, with and then class, with inverse-this
+				.#{  $class-secondary } & { // secondary then theme, with and then class, with inverse-this
+					.#{  $class-name }, 
+					&.#{ $class-name } {
+						&.#{ $class-inverse-this } {
+							@content;
+							// @extend .#{ $themed-style-name } !optional; // The reason for the !optional is that when the style @content is actually empty, the resultant .#{ $themed-style-name } won't actually be created which will cause an indefinite hang in the SASS compiling. SASS doesn't yet let you do any kind of checking that @content exists or not, so adding this !optional is the only means of accounting for styles that basically aren't defined for the given theme.
+						}
+					}
+				}
+				.#{ $class-inverse-this }.#{ $class-secondary-this }, // theme then inverse-this with secondary-this, with class
+				&.#{ $class-inverse-this }.#{ $class-secondary-this } { // theme with inverse-this with secondary-this, with class
+					&.#{ $class-name } {
+						@content;
+						// @extend .#{ $themed-style-name } !optional; // The reason for the !optional is that when the style @content is actually empty, the resultant .#{ $themed-style-name } won't actually be created which will cause an indefinite hang in the SASS compiling. SASS doesn't yet let you do any kind of checking that @content exists or not, so adding this !optional is the only means of accounting for styles that basically aren't defined for the given theme.
+					}
+				}
+			}
 		}
 	}
 }
 
-@mixin declare-themeless-style( 
+@mixin declare-themable-style(
 	$class-name        ,
+	$is-themeless      ,
 	$has-inverse       : false,
 	$has-secondary     : false,
 	$with-when-hovered : false,
@@ -409,8 +472,9 @@ $more-margin-index     : 6;
 	$with-when-last    : false, 
 	$with-when-ff      : false
 ) {
-	$current-inverse  : false;
-	$current-secondary: false;
+	$current-inverse     : false;
+	$current-secondary   : false;
+	$current-is-themeless: $is-themeless;
 
 	$class-name-when-hovered : get-when-hovered-class-name(  $class-name );
 	$class-name-when-active  : get-when-active-class-name(   $class-name );
@@ -420,53 +484,80 @@ $more-margin-index     : 6;
 	$class-name-when-last    : get-when-last-class-name(     $class-name );
 	$class-name-when-ff      : get-when-ff-class-name(       $class-name );
 
-	@include declare-style(                           $class-name: $class-name,               $is-themeless: true ) {                          @content;     }
-	@if $with-when-hovered  { @include declare-style( $class-name: $class-name-when-hovered,  $is-themeless: true ) { @include when-hovered  { @content; } } }
-	@if $with-when-active   { @include declare-style( $class-name: $class-name-when-active,   $is-themeless: true ) { @include when-active   { @content; } } }
-	@if $with-when-touching { @include declare-style( $class-name: $class-name-when-touching, $is-themeless: true ) { @include when-touching { @content; } } }
-	@if $with-when-retina   { @include declare-style( $class-name: $class-name-when-retina,   $is-themeless: true ) { @include when-retina   { @content; } } }
-	@if $with-when-first    { @include declare-style( $class-name: $class-name-when-first,    $is-themeless: true ) { @include when-first    { @content; } } }
-	@if $with-when-last     { @include declare-style( $class-name: $class-name-when-last,     $is-themeless: true ) { @include when-last     { @content; } } }
-	@if $with-when-ff       { @include declare-style( $class-name: $class-name-when-ff,       $is-themeless: true ) { @include when-ff       { @content; } } }
+	@include                           declare-style( $class-name: $class-name               ) {                          @content;     }
+	@if $with-when-hovered  { @include declare-style( $class-name: $class-name-when-hovered  ) { @include when-hovered  { @content; } } }
+	@if $with-when-active   { @include declare-style( $class-name: $class-name-when-active   ) { @include when-active   { @content; } } }
+	@if $with-when-touching { @include declare-style( $class-name: $class-name-when-touching ) { @include when-touching { @content; } } }
+	@if $with-when-retina   { @include declare-style( $class-name: $class-name-when-retina   ) { @include when-retina   { @content; } } }
+	@if $with-when-first    { @include declare-style( $class-name: $class-name-when-first    ) { @include when-first    { @content; } } }
+	@if $with-when-last     { @include declare-style( $class-name: $class-name-when-last     ) { @include when-last     { @content; } } }
+	@if $with-when-ff       { @include declare-style( $class-name: $class-name-when-ff       ) { @include when-ff       { @content; } } }
 
 	@if $has-inverse {
 		$current-inverse  : true;
 		$current-secondary: false;
-		@include declare-inverse-style(                           $class-name: $class-name,               $is-themeless: true ) {                          @content;     }
-		@if $with-when-hovered  { @include declare-inverse-style( $class-name: $class-name-when-hovered,  $is-themeless: true ) { @include when-hovered  { @content; } } }
-		@if $with-when-active   { @include declare-inverse-style( $class-name: $class-name-when-active,   $is-themeless: true ) { @include when-active   { @content; } } }
-		@if $with-when-touching { @include declare-inverse-style( $class-name: $class-name-when-touching, $is-themeless: true ) { @include when-touching { @content; } } }
-		@if $with-when-retina   { @include declare-inverse-style( $class-name: $class-name-when-retina,   $is-themeless: true ) { @include when-retina   { @content; } } }
-		@if $with-when-first    { @include declare-inverse-style( $class-name: $class-name-when-first,    $is-themeless: true ) { @include when-first    { @content; } } }
-		@if $with-when-last     { @include declare-inverse-style( $class-name: $class-name-when-last,     $is-themeless: true ) { @include when-last     { @content; } } }
-		@if $with-when-ff       { @include declare-inverse-style( $class-name: $class-name-when-ff,       $is-themeless: true ) { @include when-ff       { @content; } } }
+		@include                           declare-inverse-style( $class-name: $class-name               ) {                          @content;     }
+		@if $with-when-hovered  { @include declare-inverse-style( $class-name: $class-name-when-hovered  ) { @include when-hovered  { @content; } } }
+		@if $with-when-active   { @include declare-inverse-style( $class-name: $class-name-when-active   ) { @include when-active   { @content; } } }
+		@if $with-when-touching { @include declare-inverse-style( $class-name: $class-name-when-touching ) { @include when-touching { @content; } } }
+		@if $with-when-retina   { @include declare-inverse-style( $class-name: $class-name-when-retina   ) { @include when-retina   { @content; } } }
+		@if $with-when-first    { @include declare-inverse-style( $class-name: $class-name-when-first    ) { @include when-first    { @content; } } }
+		@if $with-when-last     { @include declare-inverse-style( $class-name: $class-name-when-last     ) { @include when-last     { @content; } } }
+		@if $with-when-ff       { @include declare-inverse-style( $class-name: $class-name-when-ff       ) { @include when-ff       { @content; } } }
 	}
 
 	@if $has-secondary {
 		$current-inverse  : false;
 		$current-secondary: true;
-		@include declare-secondary-style(                           $class-name: $class-name,               $is-themeless: true ) {                          @content;     }
-		@if $with-when-hovered  { @include declare-secondary-style( $class-name: $class-name-when-hovered,  $is-themeless: true ) { @include when-hovered  { @content; } } }
-		@if $with-when-active   { @include declare-secondary-style( $class-name: $class-name-when-active,   $is-themeless: true ) { @include when-active   { @content; } } }
-		@if $with-when-touching { @include declare-secondary-style( $class-name: $class-name-when-touching, $is-themeless: true ) { @include when-touching { @content; } } }
-		@if $with-when-retina   { @include declare-secondary-style( $class-name: $class-name-when-retina,   $is-themeless: true ) { @include when-retina   { @content; } } }
-		@if $with-when-first    { @include declare-secondary-style( $class-name: $class-name-when-first,    $is-themeless: true ) { @include when-first    { @content; } } }
-		@if $with-when-last     { @include declare-secondary-style( $class-name: $class-name-when-last,     $is-themeless: true ) { @include when-last     { @content; } } }
-		@if $with-when-ff       { @include declare-secondary-style( $class-name: $class-name-when-ff,       $is-themeless: true ) { @include when-ff       { @content; } } }
+		@include                           declare-secondary-style( $class-name: $class-name               ) {                          @content;     }
+		@if $with-when-hovered  { @include declare-secondary-style( $class-name: $class-name-when-hovered  ) { @include when-hovered  { @content; } } }
+		@if $with-when-active   { @include declare-secondary-style( $class-name: $class-name-when-active   ) { @include when-active   { @content; } } }
+		@if $with-when-touching { @include declare-secondary-style( $class-name: $class-name-when-touching ) { @include when-touching { @content; } } }
+		@if $with-when-retina   { @include declare-secondary-style( $class-name: $class-name-when-retina   ) { @include when-retina   { @content; } } }
+		@if $with-when-first    { @include declare-secondary-style( $class-name: $class-name-when-first    ) { @include when-first    { @content; } } }
+		@if $with-when-last     { @include declare-secondary-style( $class-name: $class-name-when-last     ) { @include when-last     { @content; } } }
+		@if $with-when-ff       { @include declare-secondary-style( $class-name: $class-name-when-ff       ) { @include when-ff       { @content; } } }
 	}
 
 	@if $has-inverse and $has-secondary {
 		$current-inverse  : true;
 		$current-secondary: true;
-		@include declare-inverse-secondary-style(                           $class-name: $class-name,               $is-themeless: true ) {                          @content;     }
-		@if $with-when-hovered  { @include declare-inverse-secondary-style( $class-name: $class-name-when-hovered,  $is-themeless: true ) { @include when-hovered  { @content; } } }
-		@if $with-when-active   { @include declare-inverse-secondary-style( $class-name: $class-name-when-active,   $is-themeless: true ) { @include when-active   { @content; } } }
-		@if $with-when-touching { @include declare-inverse-secondary-style( $class-name: $class-name-when-touching, $is-themeless: true ) { @include when-touching { @content; } } }
-		@if $with-when-retina   { @include declare-inverse-secondary-style( $class-name: $class-name-when-retina,   $is-themeless: true ) { @include when-retina   { @content; } } }
-		@if $with-when-first    { @include declare-inverse-secondary-style( $class-name: $class-name-when-first,    $is-themeless: true ) { @include when-first    { @content; } } }
-		@if $with-when-last     { @include declare-inverse-secondary-style( $class-name: $class-name-when-last,     $is-themeless: true ) { @include when-last     { @content; } } }
-		@if $with-when-ff       { @include declare-inverse-secondary-style( $class-name: $class-name-when-ff,       $is-themeless: true ) { @include when-ff       { @content; } } }
+		@include                           declare-inverse-secondary-style( $class-name: $class-name               ) {                          @content;     }
+		@if $with-when-hovered  { @include declare-inverse-secondary-style( $class-name: $class-name-when-hovered  ) { @include when-hovered  { @content; } } }
+		@if $with-when-active   { @include declare-inverse-secondary-style( $class-name: $class-name-when-active   ) { @include when-active   { @content; } } }
+		@if $with-when-touching { @include declare-inverse-secondary-style( $class-name: $class-name-when-touching ) { @include when-touching { @content; } } }
+		@if $with-when-retina   { @include declare-inverse-secondary-style( $class-name: $class-name-when-retina   ) { @include when-retina   { @content; } } }
+		@if $with-when-first    { @include declare-inverse-secondary-style( $class-name: $class-name-when-first    ) { @include when-first    { @content; } } }
+		@if $with-when-last     { @include declare-inverse-secondary-style( $class-name: $class-name-when-last     ) { @include when-last     { @content; } } }
+		@if $with-when-ff       { @include declare-inverse-secondary-style( $class-name: $class-name-when-ff       ) { @include when-ff       { @content; } } }
 	}
+}
+
+@mixin declare-themeless-style( 
+	$class-name        ,
+	$has-inverse       ,
+	$has-secondary     ,
+	$with-when-hovered ,
+	$with-when-active  , 
+	$with-when-touching, 
+	$with-when-retina  , 
+	$with-when-first   , 
+	$with-when-last    , 
+	$with-when-ff      
+) {
+	@include declare-themable-style( 
+		$class-name        : $class-name        ,
+		$has-inverse       : $has-inverse       ,
+		$has-secondary     : $has-secondary     ,
+		$with-when-hovered : $with-when-hovered ,
+		$with-when-active  : $with-when-active  , 
+		$with-when-touching: $with-when-touching, 
+		$with-when-retina  : $with-when-retina  , 
+		$with-when-first   : $with-when-first   , 
+		$with-when-last    : $with-when-last    , 
+		$with-when-ff      : $with-when-ff      ,
+		$is-themeless      : true
+	) { @content; }
 }
 
 @mixin declare-themed-style(
@@ -482,67 +573,19 @@ $more-margin-index     : 6;
 	$with-when-last    : false,
 	$with-when-ff      : false
 ) {
-	$current-inverse  : false;
-	$current-secondary: false;
-
-	$class-name-when-hovered : get-when-hovered-class-name(  $class-name );
-	$class-name-when-active  : get-when-active-class-name(   $class-name );
-	$class-name-when-touching: get-when-touching-class-name( $class-name );
-	$class-name-when-retina  : get-when-retina-class-name(   $class-name );
-	$class-name-when-first   : get-when-first-class-name(    $class-name );
-	$class-name-when-last    : get-when-last-class-name(     $class-name );
-	$class-name-when-ff      : get-when-ff-class-name(       $class-name );
-
-	@include declare-style(                           $class-name: $class-name,               $theme: $theme, $is-themeless: false ) {                          @content;     }
-	@if $with-when-hovered  { @include declare-style( $class-name: $class-name-when-hovered,  $theme: $theme, $is-themeless: false ) { @include when-hovered  { @content; } } }
-	@if $with-when-active   { @include declare-style( $class-name: $class-name-when-active,   $theme: $theme, $is-themeless: false ) { @include when-active   { @content; } } }
-	@if $with-when-touching { @include declare-style( $class-name: $class-name-when-touching, $theme: $theme, $is-themeless: false ) { @include when-touching { @content; } } }
-	@if $with-when-retina   { @include declare-style( $class-name: $class-name-when-retina,   $theme: $theme, $is-themeless: false ) { @include when-retina   { @content; } } }
-	@if $with-when-first    { @include declare-style( $class-name: $class-name-when-first,    $theme: $theme, $is-themeless: false ) { @include when-first    { @content; } } }
-	@if $with-when-last     { @include declare-style( $class-name: $class-name-when-last,     $theme: $theme, $is-themeless: false ) { @include when-last     { @content; } } }
-	@if $with-when-ff       { @include declare-style( $class-name: $class-name-when-ff,       $theme: $theme, $is-themeless: false ) { @include when-ff       { @content; } } }
-		
-	@if $has-inverse {
-		$current-inverse  : true;
-		$current-secondary: false;
-
-		@include declare-inverse-style(                           $class-name: $class-name,               $theme: $theme, $is-themeless: false ) {                          @content;     }
-		@if $with-when-hovered  { @include declare-inverse-style( $class-name: $class-name-when-hovered,  $theme: $theme, $is-themeless: false ) { @include when-hovered  { @content; } } }
-		@if $with-when-active   { @include declare-inverse-style( $class-name: $class-name-when-active,   $theme: $theme, $is-themeless: false ) { @include when-active   { @content; } } }
-		@if $with-when-touching { @include declare-inverse-style( $class-name: $class-name-when-touching, $theme: $theme, $is-themeless: false ) { @include when-touching { @content; } } }
-		@if $with-when-retina   { @include declare-inverse-style( $class-name: $class-name-when-retina,   $theme: $theme, $is-themeless: false ) { @include when-retina   { @content; } } }
-		@if $with-when-first    { @include declare-inverse-style( $class-name: $class-name-when-first,    $theme: $theme, $is-themeless: false ) { @include when-first    { @content; } } }
-		@if $with-when-last     { @include declare-inverse-style( $class-name: $class-name-when-last,     $theme: $theme, $is-themeless: false ) { @include when-last     { @content; } } }
-		@if $with-when-ff       { @include declare-inverse-style( $class-name: $class-name-when-ff,       $theme: $theme, $is-themeless: false ) { @include when-ff       { @content; } } }
-	}
-
-	@if $has-secondary {
-		$current-inverse  : false;
-		$current-secondary: true;
-
-		@include declare-secondary-style(                           $class-name: $class-name,               $theme: $theme, $is-themeless: false ) {                          @content;     }
-		@if $with-when-hovered  { @include declare-secondary-style( $class-name: $class-name-when-hovered,  $theme: $theme, $is-themeless: false ) { @include when-hovered  { @content; } } }
-		@if $with-when-active   { @include declare-secondary-style( $class-name: $class-name-when-active,   $theme: $theme, $is-themeless: false ) { @include when-active   { @content; } } }
-		@if $with-when-touching { @include declare-secondary-style( $class-name: $class-name-when-touching, $theme: $theme, $is-themeless: false ) { @include when-touching { @content; } } }
-		@if $with-when-retina   { @include declare-secondary-style( $class-name: $class-name-when-retina,   $theme: $theme, $is-themeless: false ) { @include when-retina   { @content; } } }
-		@if $with-when-first    { @include declare-secondary-style( $class-name: $class-name-when-first,    $theme: $theme, $is-themeless: false ) { @include when-first    { @content; } } }
-		@if $with-when-last     { @include declare-secondary-style( $class-name: $class-name-when-last,     $theme: $theme, $is-themeless: false ) { @include when-last     { @content; } } }
-		@if $with-when-ff       { @include declare-secondary-style( $class-name: $class-name-when-ff,       $theme: $theme, $is-themeless: false ) { @include when-ff       { @content; } } }
-	}
-
-	@if $has-inverse and $has-secondary {
-		$current-inverse  : true;
-		$current-secondary: true;
-
-		@include declare-inverse-secondary-style(                           $class-name: $class-name,               $theme: $theme, $is-themeless: false ) {                          @content;     }
-		@if $with-when-hovered  { @include declare-inverse-secondary-style( $class-name: $class-name-when-hovered,  $theme: $theme, $is-themeless: false ) { @include when-hovered  { @content; } } }
-		@if $with-when-active   { @include declare-inverse-secondary-style( $class-name: $class-name-when-active,   $theme: $theme, $is-themeless: false ) { @include when-active   { @content; } } }
-		@if $with-when-touching { @include declare-inverse-secondary-style( $class-name: $class-name-when-touching, $theme: $theme, $is-themeless: false ) { @include when-touching { @content; } } }
-		@if $with-when-retina   { @include declare-inverse-secondary-style( $class-name: $class-name-when-retina,   $theme: $theme, $is-themeless: false ) { @include when-retina   { @content; } } }
-		@if $with-when-first    { @include declare-inverse-secondary-style( $class-name: $class-name-when-first,    $theme: $theme, $is-themeless: false ) { @include when-first    { @content; } } }
-		@if $with-when-last     { @include declare-inverse-secondary-style( $class-name: $class-name-when-last,     $theme: $theme, $is-themeless: false ) { @include when-last     { @content; } } }
-		@if $with-when-ff       { @include declare-inverse-secondary-style( $class-name: $class-name-when-ff,       $theme: $theme, $is-themeless: false ) { @include when-ff       { @content; } } }
-	}
+	@include declare-themable-style( 
+		$class-name        : $class-name        ,
+		$has-inverse       : $has-inverse       ,
+		$has-secondary     : $has-secondary     ,
+		$with-when-hovered : $with-when-hovered ,
+		$with-when-active  : $with-when-active  , 
+		$with-when-touching: $with-when-touching, 
+		$with-when-retina  : $with-when-retina  , 
+		$with-when-first   : $with-when-first   , 
+		$with-when-last    : $with-when-last    , 
+		$with-when-ff      : $with-when-ff      ,
+		$is-themeless      : false
+	) { @content; }
 }
 
 @mixin declare-base-styles( $theme: $default-theme ) {
