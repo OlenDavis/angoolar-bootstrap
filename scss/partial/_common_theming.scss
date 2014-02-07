@@ -3,6 +3,7 @@ $current-inverse            : false;
 $current-secondary          : false;
 $current-with-this-modifiers: false; // indicates whether to render support for the secondary-this and inverse-this modifiers
 $current-with-themed-style  : false; // indicates whether to render the fully themed style class for each style; e.g. .blue-inverse-secondary-button rather than .blue.inverse.secondary.button
+$current-is-themeless       : true;
 
 $name-index     : 1;
 $extends-index  : 2;
