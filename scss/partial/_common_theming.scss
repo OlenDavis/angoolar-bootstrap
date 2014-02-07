@@ -535,15 +535,15 @@ $more-margin-index     : 6;
 
 @mixin declare-themeless-style( 
 	$class-name        ,
-	$has-inverse       ,
-	$has-secondary     ,
-	$with-when-hovered ,
-	$with-when-active  , 
-	$with-when-touching, 
-	$with-when-retina  , 
-	$with-when-first   , 
-	$with-when-last    , 
-	$with-when-ff      
+	$has-inverse       : false,
+	$has-secondary     : false,
+	$with-when-hovered : false,
+	$with-when-active  : false, 
+	$with-when-touching: false, 
+	$with-when-retina  : false, 
+	$with-when-first   : false, 
+	$with-when-last    : false, 
+	$with-when-ff      : false
 ) {
 	@include declare-themable-style( 
 		$class-name        : $class-name        ,
@@ -566,11 +566,11 @@ $more-margin-index     : 6;
 	$has-inverse       : false,
 	$has-secondary     : false,
 	$with-when-hovered : false,
-	$with-when-active  : false,
-	$with-when-touching: false,
-	$with-when-retina  : false,
-	$with-when-first   : false,
-	$with-when-last    : false,
+	$with-when-active  : false, 
+	$with-when-touching: false, 
+	$with-when-retina  : false, 
+	$with-when-first   : false, 
+	$with-when-last    : false, 
 	$with-when-ff      : false
 ) {
 	@include declare-themable-style( 
