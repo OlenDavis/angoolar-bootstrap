@@ -1,26 +1,25 @@
 {
-	"name"       : "angoolar-bootstrap",
-	"authors"    : [ "Olen Davis <spelledlikeitsounds@gmail.com>" ],
-	"description": "This defines the CSS framework for establishing a common pure-CSS styling framework for any Angoolar project. It also helps developers put an enormous amount of dynamism and configurability into their CSS with suprisingly little effort.",
-	"keywords"   : [
-		"angoolar",
-		"angular",
-		"zootstrap",
-		"bootstrap",
-		"css",
-		"sass",
-		"scss",
-		"framework",
-		"approach"
-	],
-	"license" : "MIT",
-	"homepage": "http://angoolar.com",
-	"ignore"  : [
-		"**/.*",
-		"node_modules",
-		"bower_components"
-	],
-	"dependencies": {
-		"angoolar-fontawesome": "~0.0.0"
-	}
+  "name": "angoolar-bootstrap",
+  "authors": [
+    "Olen Davis <spelledlikeitsounds@gmail.com>"
+  ],
+  "description": "This defines the CSS framework for establishing a common pure-CSS styling framework for any Angoolar project. It also helps developers put an enormous amount of dynamism and configurability into their CSS with suprisingly little effort.",
+  "keywords": [
+    "angoolar",
+    "angular",
+    "zootstrap",
+    "bootstrap",
+    "css",
+    "sass",
+    "scss",
+    "framework",
+    "approach"
+  ],
+  "license": "MIT",
+  "homepage": "http://angoolar.com",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components"
+  ]
 }
